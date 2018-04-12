@@ -12,6 +12,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
@@ -81,8 +82,8 @@ public class GoogleSheetsUtil {
                         .build();
         Credential credential = new AuthorizationCodeInstalledApp(
                 flow, new LocalServerReceiver()).authorize("xiayuan1992@gmail.com");
-        System.out.println(
-                "Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
+//        System.out.println(
+//                "Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
         return credential;
     }
 
@@ -112,6 +113,26 @@ public class GoogleSheetsUtil {
 
         ValueRange body = new ValueRange().setValues(insertValues);
         UpdateValuesResponse result = service.spreadsheets().values().update(spreadsheetId, range, body)
+                        .setValueInputOption("RAW")
+                        .execute();
+
+        return result;
+    }
+
+    /**
+     *
+     * @param spreadsheetId 表单id
+     * @param range 指明在表单的哪个sheet页上做append操作
+     * @param insertValues 需要append的值
+     * @return
+     * @throws Exception
+     */
+    public static AppendValuesResponse append(String spreadsheetId, String range, List<List<Object>> insertValues) throws Exception {
+        Sheets service = getSheetsService();
+
+        ValueRange body = new ValueRange().setValues(insertValues);
+        AppendValuesResponse result =
+                service.spreadsheets().values().append(spreadsheetId, range, body)
                         .setValueInputOption("RAW")
                         .execute();
 
